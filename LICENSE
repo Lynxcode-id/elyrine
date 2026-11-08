@@ -1,0 +1,158 @@
+ERINE-AI • ELYRINE — LISENSI SUMBER TERBUKA NON-KOMERSIAL (v1.0)
+ERINE-AI • ELYRINE — SOURCE-AVAILABLE NONCOMMERCIAL LICENSE (v1.0)
+
+Copyright (c) 2026 Arman Maulana (Lynx decode). Seluruh hak dilindungi
+sesuai ketentuan di bawah. All rights reserved except as granted below.
+
+Versi Indonesia dan Inggris bermakna sama. Jika ada perbedaan, versi
+Indonesia yang dipakai. Ketentuan tambahan ada di
+ELYRINE-ADDITIONAL-TERMS.md dan menjadi bagian dari lisensi ini.
+
+
+=====================================================================
+BAGIAN INDONESIA
+=====================================================================
+
+1. DEFINISI
+   - "Proyek"   : ERINE-AI • ELYRINE beserta kode sumber, plugin, aset,
+                  dan dokumentasinya.
+   - "Pemilik"  : Arman Maulana (Lynx decode), pemegang hak cipta.
+   - "Anda"     : setiap orang yang memakai, menyalin, mengubah, atau
+                  membagikan Proyek.
+   - "Remake"   : karya turunan, recode, fork, rebrand, atau versi
+                  modifikasi dari Proyek, sebagian maupun seluruhnya.
+   - "Komersial": segala bentuk penggunaan yang bertujuan, atau
+                  menghasilkan, keuntungan uang atau barang bernilai.
+
+2. HAK YANG DIBERIKAN (tanpa izin tambahan)
+   Anda boleh, secara gratis dan untuk tujuan non-komersial:
+   a. Menjalankan dan memakai Proyek untuk diri sendiri atau komunitas
+      tanpa memungut bayaran.
+   b. Mempelajari kode sumbernya.
+   c. Mengubah dan membuat Remake untuk keperluan pribadi, belajar,
+      atau pengembangan non-komersial.
+   d. Membagikan ulang Proyek atau Remake secara gratis, dengan syarat
+      pada pasal 4.
+
+3. YANG DILARANG TANPA IZIN TERTULIS PEMILIK
+   Tanpa izin tertulis dari Pemilik, Anda tidak boleh:
+   a. Menjual, menyewakan, melisensikan ulang, atau memperdagangkan
+      Proyek atau Remake, termasuk lewat marketplace, grup jual-beli,
+      atau layanan perantara.
+   b. Menjadikan Proyek atau Remake sebagai produk atau layanan
+      berbayar, termasuk memungut bayaran untuk akses ke bot yang
+      dijalankan dengan kode ini.
+   c. Menggabungkan Proyek ke produk komersial.
+   d. Menghapus atau mengubah nama Pemilik, hak cipta, kredit, dan
+      pemberitahuan lisensi.
+   e. Mengaku sebagai pembuat asli Proyek, atau merebrand secara publik
+      seolah-olah karya sendiri.
+   f. Menyebarkan Remake dengan lisensi yang lebih longgar dari lisensi
+      ini.
+
+4. SYARAT MEMBAGIKAN REMAKE
+   Jika Anda membagikan Remake (gratis maupun dengan izin komersial),
+   Anda wajib:
+   a. Menyertakan lisensi ini beserta ELYRINE-ADDITIONAL-TERMS.md.
+   b. Mempertahankan semua kredit, nama Pemilik, dan atribusi upstream.
+   c. Mencantumkan secara jelas: "Berdasarkan ERINE-AI • ELYRINE oleh
+      Arman Maulana (Lynx decode)" di README dan di menu/info bot.
+   d. Menandai perubahan yang Anda buat.
+   e. Menerapkan lisensi ini pada Remake Anda.
+
+5. IZIN KOMERSIAL DAN REMAKE UNTUK DIJUAL
+   Menjual Remake dimungkinkan, tetapi hanya dengan izin tertulis
+   Pemilik dan dengan menyertakan bukti izin sesuai
+   ELYRINE-ADDITIONAL-TERMS.md (misalnya tangkapan layar chat yang
+   menunjukkan Pemilik mengizinkan). Izin bersifat pribadi, hanya untuk
+   ruang lingkup yang disebutkan, tidak dapat dipindahtangankan, dan
+   dapat dicabut jika Anda melanggar lisensi ini. Tanpa bukti izin yang
+   dapat diverifikasi, dianggap tidak ada izin.
+
+6. KOMPONEN PIHAK KETIGA
+   Lisensi ini hanya mencakup karya asli Pemilik. Komponen milik pihak
+   lain (misalnya Nao-MD, Baileys, MessageBuilder, Starseal, scraper
+   komunitas, dan dependency npm) tetap tunduk pada lisensi dan
+   atribusi pemilik aslinya. Jika lisensi pihak ketiga mengharuskan hal
+   yang berbeda untuk komponen itu (misalnya GPL-3.0), ketentuan
+   pihak ketiga itulah yang berlaku untuk komponen tersebut.
+
+7. PENGAKHIRAN
+   Jika Anda melanggar lisensi ini, hak Anda berakhir otomatis. Hak
+   dapat dipulihkan jika pelanggaran dihentikan dan diperbaiki dalam 30
+   hari sejak diberi tahu oleh Pemilik, kecuali pelanggarannya berupa
+   penjualan tanpa izin atau penghapusan kredit yang disengaja.
+
+8. TANPA JAMINAN
+   Proyek disediakan "APA ADANYA", tanpa jaminan apa pun, tersurat
+   maupun tersirat. Pemilik tidak bertanggung jawab atas kerugian atau
+   kerusakan apa pun akibat pemakaian Proyek, termasuk pemblokiran akun
+   WhatsApp. Proyek independen dan tidak berafiliasi dengan WhatsApp
+   maupun Meta.
+
+
+=====================================================================
+ENGLISH SECTION
+=====================================================================
+
+1. DEFINITIONS
+   "Project" means ERINE-AI • ELYRINE, including source code, plugins,
+   assets, and documentation. "Owner" means Arman Maulana (Lynx
+   decode), the copyright holder. "You" means anyone who uses, copies,
+   modifies, or distributes the Project. "Remake" means any derivative
+   work, recode, fork, rebrand, or modified version of the Project, in
+   whole or in part. "Commercial" means any use intended for, or
+   resulting in, money or other valuable consideration.
+
+2. GRANT (no further permission needed)
+   You may, free of charge and for noncommercial purposes: (a) run and
+   use the Project for yourself or your community without charging;
+   (b) study the source code; (c) modify it and create Remakes for
+   personal, educational, or noncommercial development; (d) share the
+   Project or a Remake free of charge, subject to Section 4.
+
+3. PROHIBITED WITHOUT THE OWNER'S WRITTEN PERMISSION
+   (a) Selling, renting, sublicensing, or trading the Project or a
+   Remake, including via marketplaces, trading groups, or
+   intermediaries. (b) Offering the Project or a Remake as a paid
+   product or service, including charging for access to a bot run with
+   this code. (c) Bundling the Project into a commercial product.
+   (d) Removing or altering the Owner's name, copyright, credits, or
+   license notices. (e) Claiming to be the original author, or publicly
+   rebranding it as your own work. (f) Distributing a Remake under a
+   more permissive license than this one.
+
+4. CONDITIONS FOR SHARING A REMAKE
+   You must: (a) include this license and ELYRINE-ADDITIONAL-TERMS.md;
+   (b) keep all credits, the Owner's name, and upstream attributions;
+   (c) state clearly, in the README and in the bot's menu/info:
+   "Based on ERINE-AI • ELYRINE by Arman Maulana (Lynx decode)";
+   (d) mark the changes you made; (e) apply this license to your Remake.
+
+5. COMMERCIAL PERMISSION AND SELLING A REMAKE
+   Selling a Remake is possible only with the Owner's written
+   permission and with proof of that permission as required by
+   ELYRINE-ADDITIONAL-TERMS.md (for example, a chat screenshot showing
+   the Owner granted permission). Permission is personal, limited to
+   the stated scope, non-transferable, and revocable if You breach this
+   license. Without verifiable proof, no permission exists.
+
+6. THIRD-PARTY COMPONENTS
+   This license covers only the Owner's original work. Components owned
+   by others (for example Nao-MD, Baileys, MessageBuilder, Starseal,
+   community scrapers, and npm dependencies) remain under their own
+   licenses and attribution requirements. Where a third-party license
+   requires something different for that component (for example
+   GPL-3.0), that license governs that component.
+
+7. TERMINATION
+   If You breach this license, your rights end automatically. They may
+   be reinstated if You stop and cure the breach within 30 days of the
+   Owner's notice, except where the breach is unauthorized selling or
+   deliberate removal of credits.
+
+8. NO WARRANTY
+   The Project is provided "AS IS" without warranty of any kind. The
+   Owner is not liable for any loss or damage arising from its use,
+   including WhatsApp account bans. The Project is independent and not
+   affiliated with WhatsApp or Meta.

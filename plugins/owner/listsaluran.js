@@ -1,0 +1,38 @@
+/*
+  ERINE-AI • ELYRINE
+  WhatsApp Bot Multi-Device · Node.js ESM
+
+  Developer   Arman Maulana (Lynx decode)
+  Versi       1.0.0
+  Lisensi     ELYRINE Source-Available Non-Commercial v1.0
+  Copyright   © 2026 Arman Maulana
+
+  Didirikan di atas Elyra Labs & ekosistemnya.
+  Komunitas   General District (induk) · INF Project · Elyra Labs
+  Engine      elyra-baileys, fork Baileys yang dikustom
+              sesuai kebutuhan bot ini.
+
+  Dilarang menjual, menyewakan, atau merebrand tanpa
+  izin tertulis dari developer. Jangan hapus kredit ini.
+*/
+
+import { listSaluran, labelSaluran } from '../../lib/saluran.js'
+
+let handler = async (m, { usedPrefix }) => {
+    const list = listSaluran()
+    if (!list.length) return m.reply(`ℹ️ Belum ada saluran terdaftar.\n\nTambah dulu:\n${usedPrefix}addsaluran idch|owner\n${usedPrefix}addsaluran idch`)
+
+    const rows = list.map((c, i) => `${i + 1}. ${c.owner ? '👑' : '📢'} *${labelSaluran(c)}*${c.owner ? ' (OWNER)' : ''}\n    \`${c.id}\``)
+    m.reply(
+        `*DAFTAR SALURAN* (${list.length})\n\n` +
+        rows.join('\n') +
+        `\n\nHapus: ${usedPrefix}delsaluran <nomor|idch|owner>`
+    )
+}
+
+handler.help = ['listsaluran']
+handler.tags = ['owner']
+handler.command = /^listsaluran$/i
+handler.owner = true
+
+export default handler
