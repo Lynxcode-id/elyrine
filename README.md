@@ -1,2 +1,0 @@
-# elyrine
-masih kosonf
