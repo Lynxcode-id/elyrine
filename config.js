@@ -119,17 +119,16 @@ global.APIKeys = {
 }
 
 // Setelan Create Panel Pterodatyle
-global.APIs.panel = 'https://panel-kamu.com'
-global.APIKeys['plta'] = 'ptla_apikeymu'
-global.APIKeys['pltc'] = 'ptlc_apikeymu'
-global.panelCfg = {
-  nest: 1, egg: 15,
-  docker_image: 'ghcr.io/parkervcp/yolks:nodejs_22',
-  startup: '...',
-  environment: { STARTUP_CMD: 'npm start', GIT_ADDRESS: '', MAIN_FILE: 'index.js' },
-  location: 1,
-  databases: 0, backups: 0, allocations: 1
-}
+// global.APIs.panel = 'https://panel-kamu.com'
+// global.APIKeys['plta'] = 'ptla_apikeymu'
+// global.APIKeys['pltc'] = 'ptlc_apikeymu'
+// global.panelCfg = {
+//  nest: 1, egg: 15,
+//  docker_image: 'ghcr.io/parkervcp/yolks:nodejs_22',
+//  startup: '...',
+//  environment: { STARTUP_CMD: 'npm start', GIT_ADDRESS: '', MAIN_FILE: 'index.js' },
+//  location: 1,
+//  databases: 0, backups: 0, allocations: 1
 
 // Setelan Entahlah 
 global.thumbbc = 'https://telegra.ph/file/05f874dc87f7e27fa8127.jpg'
