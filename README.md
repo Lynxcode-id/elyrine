@@ -12,7 +12,8 @@
 
 <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&amp;weight=600&amp;size=17&amp;duration=2800&amp;pause=900&amp;color=46D98A&amp;center=true&amp;vCenter=true&amp;width=820&amp;height=34&amp;lines=Modular+WhatsApp+Automation;Powered+by+elyra-baileys;AI+%E2%80%A2+Downloader+%E2%80%A2+Media+%E2%80%A2+Channel;Built+with+Node.js+%26+ES+Modules" alt="Animated project tagline" />
 
-**An extensible WhatsApp automation project powered by `elyra-baileys`.**
+**An extensible WhatsApp automation project powered by 
+`elyra-baileys`.**
 
 ELYRINE menggabungkan AI, pencarian, downloader, pengolahan media, sticker maker, utilitas grup, sistem limit dan membership, manajemen saluran, serta kontrol owner dalam satu ekosistem bot WhatsApp Multi-Device.
 
