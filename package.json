@@ -1,6 +1,6 @@
 {
     "name": "erine-ai",
-    "version": "1.0.0",
+    "version": "1.0.5",
     "description": "ERINE-AI — WhatsApp bot (elyra-baileys engine)",
     "main": "index.js",
     "type": "module",
@@ -35,7 +35,7 @@
         "@vitalets/google-translate-api": "^9.2.0",
         "audio-decode": "latest",
         "awesome-phonenumber": "^3.4.0",
-        "axios": "^1.12.2",
+        "axios": "latest",
         "better-sqlite3": "^11.0.0",
         "cfonts": "^2.10.0",
         "chalk": "^5.1.0",
