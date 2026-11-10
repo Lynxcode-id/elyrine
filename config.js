@@ -107,6 +107,7 @@ global.APIs = {
   theresav: 'https://api.theresav.eu',
   lynxapis: 'https://lynxapis.my.id',
   yonz: 'https://api.yonz.cloud',
+  xrina: 'https://apiii-xrina.my.id',
 }
 
 // Set pake apikeylu sendiri ambil dari link web diatas global.APIs
