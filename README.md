@@ -93,8 +93,8 @@ Tujuan pengembangannya adalah menyediakan satu fondasi bot yang:
 
 <div align="center">
 
-<a href="https://github.com/Lynx-decode/ERINE-AI">
-  <img src="https://github-readme-stats.vercel.app/api/pin/?username=Lynx-decode&amp;repo=ERINE-AI&amp;show_owner=true&amp;hide_border=true&amp;theme=transparent" alt="ERINE-AI GitHub repository card" />
+<a href="https://github.com/Lynxcode-id/elyrine">
+  <img src="https://github-readme-stats.vercel.app/api/pin/?username=Lynxcode-id&amp;repo=elyrine&amp;show_owner=true&amp;hide_border=true&amp;theme=transparent" alt="Elyrine GitHub repository card" />
 </a>
 
 </div>
