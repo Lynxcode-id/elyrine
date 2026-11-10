@@ -19,7 +19,7 @@
 import yts from 'yt-search'
 import axios from 'axios'
 import { uploadThumbnail, sendThumbnail } from '../../lib/thumbnail.js'
-import { fetchYtUltra, pickAudio } from '../../scrape/ytultra.js'
+import { ytmp3Api } from '../../lib/ytapi.js'
 
 const MAX_SIZE = 50 * 1024 * 1024
 const MAX_SECONDS = 60 * 60
@@ -104,12 +104,11 @@ let handler = async (m, { conn, text, usedPrefix }) => {
 
   let info, pick
   try {
-    info = await fetchYtUltra(v.url)
-    pick = pickAudio(info.media)
-    if (!pick) throw new Error('Tidak ada link download yang tersedia.')
+    info = await ytmp3Api(v.url)
+    pick = { url: info.download_url, type: 'audio', ext: 'mp3' }
   } catch (e) {
     await m.react('❌').catch(() => { })
-    return m.gagal(`Gagal mengambil audio: ${e.message}`, 'YTUltra')
+    return m.gagal(`Gagal mengambil audio: ${e.message}`, 'Theresav')
   }
 
   let audio
@@ -123,7 +122,7 @@ let handler = async (m, { conn, text, usedPrefix }) => {
   } catch (e) {
     await m.react('❌').catch(() => { })
     const tooBig = /maxContentLength|exceeded/i.test(e.message)
-    return m.gagal(tooBig ? 'Ukuran audio melebihi 50MB.' : `Gagal mengunduh audio: ${e.message}`, 'YTUltra')
+    return m.gagal(tooBig ? 'Ukuran audio melebihi 50MB.' : `Gagal mengunduh audio: ${e.message}`, 'Theresav')
   }
 
   const title = info.title || v.title

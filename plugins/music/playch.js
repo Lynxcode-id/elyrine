@@ -21,7 +21,7 @@ import axios from 'axios'
 import { fileTypeFromBuffer } from 'file-type'
 import { uploadThumbnail, sendThumbnail } from '../../lib/thumbnail.js'
 import { listSaluran, findSaluran, getOwnerSaluran, parseChannelInput, labelSaluran } from '../../lib/saluran.js'
-import { fetchYtUltra, pickAudio } from '../../scrape/ytultra.js'
+import { ytmp3Api } from '../../lib/ytapi.js'
 import { ffmpeg, isOggOpus, prepareAudioMessage } from '../../lib/converter.js'
 
 const MAX_SIZE = 50 * 1024 * 1024
@@ -149,12 +149,11 @@ let handler = async (m, { conn, text, usedPrefix, isOwner }) => {
 
   let info, pick
   try {
-    info = await fetchYtUltra(v.url)
-    pick = pickAudio(info.media)
-    if (!pick) throw new Error('Tidak ada link download yang tersedia.')
+    info = await ytmp3Api(v.url)
+    pick = { url: info.download_url, type: 'audio', ext: 'mp3' }
   } catch (e) {
     await m.react('❌').catch(() => { })
-    return m.gagal(`Gagal mengambil audio: ${e.message}`, 'YTUltra')
+    return m.gagal(`Gagal mengambil audio: ${e.message}`, 'Theresav')
   }
 
   let audio
@@ -167,7 +166,7 @@ let handler = async (m, { conn, text, usedPrefix, isOwner }) => {
   } catch (e) {
     await m.react('❌').catch(() => { })
     const tooBig = /maxContentLength|exceeded/i.test(e.message)
-    return m.gagal(tooBig ? 'Ukuran audio melebihi 50MB.' : `Gagal mengunduh audio: ${e.message}`, 'YTUltra')
+    return m.gagal(tooBig ? 'Ukuran audio melebihi 50MB.' : `Gagal mengunduh audio: ${e.message}`, 'Theresav')
   }
 
   const title = info.title || v.title
