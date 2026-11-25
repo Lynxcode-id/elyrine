@@ -54,7 +54,6 @@ ELYRINE menggabungkan AI, pencarian, downloader, pengolahan media, sticker maker
 - **No backdoor 100%.** Tidak ada akses jarak jauh tersembunyi, `eval`, atau `new Function` di source. Perintah eksekusi seperti `exec`, `exec2`, `addplugin`, dan `restart` hanya bisa dipakai owner.
 - **Baileys use: `elyrine-baileys`.** Baileys baru yang dioptimalkan khusus untuk ELYRINE, menggantikan `elyra-baileys` lama.
 - **Tanpa kredensial bawaan.** Apikey dan token dikosongkan. Isi sendiri di `config.js` sesuai kebutuhan.
-- **Kredit tetap utuh.** Lisensi ELYRINE Source-Available Non-Commercial berlaku. Dilarang menjual, menyewakan, atau merebrand tanpa izin developer, dan jangan hapus kredit.
 
 ## Tentang ELYRINE
 
