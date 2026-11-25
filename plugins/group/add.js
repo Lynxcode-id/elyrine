@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -20,10 +20,10 @@ import fetch from 'node-fetch';
 
 let handler = async (m, { conn, text, participants, usedPrefix, command }) => {
     if (!text) throw `_Masukan nomor!_\nContoh:\n\n${usedPrefix + command} ${global.owner[0]}`;
-    
+
     await m.wait();
     const _participants = participants.map(user => user.id);
-    
+
     const users = await Promise.all(
         text.split(',')
             .map(v => v.replace(/[^0-9]/g, ''))
@@ -49,7 +49,7 @@ let handler = async (m, { conn, text, participants, usedPrefix, command }) => {
             const inviteCode = participant.content.content[0].attrs.code;
             const inviteExp = participant.content.content[0].attrs.expiration;
             await m.reply(`Mengundang @${jid.split('@')[0]} menggunakan invite...`);
-            
+
             await conn.sendGroupV4Invite(
                 m.chat,
                 jid,

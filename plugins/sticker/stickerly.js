@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -17,70 +17,159 @@
 */
 
 import axios from 'axios'
-import { makeSticker } from '../../lib/sticker-maker.js'
 
-const BASE = global.APIs?.xrina || 'https://apiii-xrina.my.id'
-const SEARCH_API = BASE + '/search/stickerly'
-const STICKERLY_PACK_API = BASE + '/download/stickerly'
+const SEARCH_URL = 'https://api.sticker.ly/v4/stickerPack/smartSearch'
+const UA = 'androidapp.stickerly/3.31.0 (M2006C3LG; U; Android 29; in-ID; id;)'
 const SESSION_TTL = 5 * 60 * 1000
 const MAX_STICKERS = 30
-const sleep = ms => new Promise(r => setTimeout(r, ms))
+const MAX_RESULTS = 40
+const packName = () => global.stickpack || 'ERINE-AI'
+const packAuthor = () => global.stickauth || global.author || 'Lynxcode'
 
 if (!global.stickerlySessions) global.stickerlySessions = new Map()
 const keyOf = m => `${m.chat}|${m.sender}`
 
-export const packUrls = data => {
-  const list = data?.stickers || data?.data?.stickers || data?.result?.stickers || data?.data || []
-  return (Array.isArray(list) ? list : [])
-    .map(x => (typeof x === 'string' ? x : x?.url || x?.image || x?.sticker || x?.link))
-    .filter(u => typeof u === 'string' && u.startsWith('http'))
-    .slice(0, MAX_STICKERS)
+const isWebp = b => Buffer.isBuffer(b) && b.length > 12 && b.toString('ascii', 0, 4) === 'RIFF' && b.toString('ascii', 8, 12) === 'WEBP'
+
+let sealLogged = false
+
+async function viaStarseal(buffer) {
+  const { create } = await import('@itsliaaa/starseal')
+  const out = await create(buffer, {
+    packName: packName(),
+    publisherName: packAuthor(),
+    emojis: ['✨']
+  }).toBuffer()
+  if (!isWebp(out)) throw new Error('starseal: hasil bukan webp')
+  return out
 }
 
-export const formatList = (query, items) => [
-  `*STICKER.LY · ${query}*`,
-  '',
-  ...items.map((x, i) => `${i + 1}. ${x.name || 'Tanpa nama'} · ${x.total ?? '?'} stiker · ${x.author || '-'}`),
-  '',
-  'Balas dengan *angka* (1-' + items.length + ') untuk ambil pack-nya.'
-].join('\n')
+function exifBuffer() {
+  const payload = Buffer.from(JSON.stringify({
+    'sticker-pack-id': `erine-ai-${Date.now()}`,
+    'sticker-pack-name': packName(),
+    'sticker-pack-publisher': packAuthor(),
+    emojis: ['✨']
+  }), 'utf8')
+  const header = Buffer.from([
+    0x49, 0x49, 0x2a, 0x00, 0x08, 0x00, 0x00, 0x00,
+    0x01, 0x00, 0x41, 0x57, 0x07, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x16, 0x00, 0x00, 0x00
+  ])
+  const exif = Buffer.concat([header, payload])
+  exif.writeUIntLE(payload.length, 14, 4)
+  return exif
+}
 
-async function sendPack(conn, m, item) {
-  const { data: res } = await axios.get(STICKERLY_PACK_API, {
-    params: { url: item.shareUrl }, timeout: 60000, validateStatus: () => true
-  })
-  const urls = packUrls(res)
-  if (!urls.length) throw 'Pack ini kosong atau API pack belum tersedia.'
-
-  const name = item.name || 'Sticker'
-  const author = item.author || 'Sticker.ly'
-  let sent = 0
-  for (const url of urls) {
-    try {
-      const { data: buf } = await axios.get(url, { responseType: 'arraybuffer', timeout: 30000 })
-      const sticker = await makeSticker({
-        buffer: Buffer.from(buf), mimetype: 'image/webp', packName: name, publisher: author
-      })
-      await conn.sendMessage(m.chat, { sticker }, { quoted: m })
-      sent++
-      await sleep(500)
-    } catch (e) { console.error('[STICKERLY] gagal satu stiker:', e.message) }
+async function viaExif(buffer) {
+  const webp = (await import('node-webpmux')).default
+  let src = buffer
+  if (!isWebp(src)) {
+    const sharp = (await import('sharp')).default
+    src = await sharp(src, { animated: true })
+      .resize(512, 512, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .webp({ quality: 90 })
+      .toBuffer()
   }
-  if (!sent) throw 'Semua stiker dalam pack gagal dikirim.'
-  return sent
+  const img = new webp.Image()
+  await img.load(src)
+  img.exif = exifBuffer()
+  return img.save(null)
 }
 
-const handler = async (m, { text, usedPrefix, command }) => {
-  const q = (text || '').trim()
-  if (!q) throw `Masukkan kata kunci.\nContoh: *${usedPrefix + command} erine jkt48*`
+async function makeSticker(buffer, animated) {
+  if (!animated) {
+    try {
+      return await viaStarseal(buffer)
+    } catch (e) {
+      if (!sealLogged) {
+        sealLogged = true
+        console.error('[STICKERLY] starseal gagal, pindah ke metode cadangan:', e.message)
+      }
+    }
+  }
+  return viaExif(buffer)
+}
+
+async function searchPacks(keyword) {
+  const { data } = await axios.post(
+    SEARCH_URL,
+    {
+      keyword,
+      enabledKeywordSearch: true,
+      filter: {
+        extendSearchResult: false,
+        sortBy: 'RECOMMENDED',
+        languages: ['ALL'],
+        minStickerCount: 5,
+        searchBy: 'ALL',
+        stickerType: 'ALL'
+      }
+    },
+    { headers: { 'User-Agent': UA, 'Content-Type': 'application/json' }, timeout: 20000, validateStatus: () => true }
+  )
+  const packs = data?.result?.stickerPacks || data?.stickerPacks || data?.data || []
+  return (Array.isArray(packs) ? packs : []).map(v => ({
+    id: v.packId,
+    name: v.name,
+    author: v.authorName || 'Unknown',
+    count: v.resourceFiles?.length || 0,
+    animated: !!v.isAnimated,
+    prefix: v.resourceUrlPrefix,
+    files: v.resourceFiles || [],
+    url: v.shareUrl || `https://sticker.ly/s/${v.packId}`
+  }))
+}
+
+async function sendStickerPack(conn, m, pick) {
+  const items = pick.files.slice(0, MAX_STICKERS).map(f => ({ image: pick.prefix + f, animated: pick.animated }))
+  const list = []
+  let firstErr = ''
+  for (const s of items) {
+    try {
+      const img = await axios.get(s.image, { responseType: 'arraybuffer', timeout: 20000, headers: { 'User-Agent': UA } })
+      const sticker = await makeSticker(Buffer.from(img.data), s.animated)
+      list.push({ data: sticker })
+    } catch (e) {
+      if (!firstErr) firstErr = e.message
+      console.error('[STICKERLY] gagal satu stiker:', e.message)
+    }
+  }
+  if (!list.length) throw `Semua stiker dalam pack gagal diproses.${firstErr ? `\n> ${firstErr}` : ''}`
+
+  await conn.sendMessage(m.chat, {
+    cover: { url: items[0].image },
+    stickers: list,
+    name: `✨ ${pick.name}`,
+    publisher: packName(),
+    description: packAuthor()
+  }, { quoted: m })
+  return list.length
+}
+
+const handler = async (m, { args, usedPrefix, command }) => {
+  const q = (args || []).join(' ').trim()
+  if (!q) throw `Masukkan kata kunci.\nContoh: *${usedPrefix + command} patrick*`
 
   await m.wait()
-  const { data: res } = await axios.get(SEARCH_API, { params: { q }, timeout: 30000, validateStatus: () => true })
-  const items = (res?.data || []).filter(x => x?.shareUrl).slice(0, 10)
-  if (res?.status !== true || !items.length) throw `Sticker untuk *${q}* tidak ditemukan.`
+  let packs
+  try {
+    packs = await searchPacks(q)
+  } catch (e) {
+    console.error('[STICKERLY] search:', e.message)
+    throw `Gagal mencari sticker pack: ${e.message}`
+  }
+  const items = packs.filter(x => x.prefix && x.files.length).slice(0, MAX_RESULTS)
+  if (!items.length) throw `Sticker untuk *${q}* tidak ditemukan.`
 
   global.stickerlySessions.set(keyOf(m), { items, query: q, at: Date.now() })
-  return m.reply(formatList(q, items))
+  return m.reply([
+    `*STICKER.LY · ${q}*`,
+    '',
+    ...items.map((x, i) => `${i + 1}. ${x.name || 'Tanpa nama'} · ${x.count} stiker · ${x.author}`),
+    '',
+    `Balas dengan *angka* (1-${items.length}) untuk ambil pack-nya.`
+  ].join('\n'))
 }
 
 handler.before = async function (m) {
@@ -93,11 +182,12 @@ handler.before = async function (m) {
   if (n < 1 || n > s.items.length) return false
 
   global.stickerlySessions.delete(keyOf(m))
+  const pick = s.items[n - 1]
   await m.wait()
   try {
-    const sent = await sendPack(this, m, s.items[n - 1])
-    await m.reply(`✅ Pack *${s.items[n - 1].name}* terkirim (${sent} stiker).`)
+    await sendStickerPack(this, m, pick)
   } catch (e) {
+    console.error('[STICKERLY]', e?.stack || e)
     await m.reply(typeof e === 'string' ? e : `Gagal ambil pack: ${e.message}`)
   }
   return true

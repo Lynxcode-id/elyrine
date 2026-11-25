@@ -9,14 +9,14 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
   izin tertulis dari developer. Jangan hapus kredit ini.
 */
 
-import syntaxerror from 'syntax-error'
+import { checkSyntax } from '../../lib/syntax.js'
 import { format } from 'util'
 import { fileURLToPath } from 'url'
 import { dirname } from 'path'
@@ -43,11 +43,7 @@ let handler = async (m, _2) => {
       return conn.reply(m.chat, format(...args), m)
     }, m, handler, require, conn, CustomArray, process, args, groupMetadata, f, f.exports, [conn, _2])
   } catch (e) {
-    let err = syntaxerror(_text, 'Execution Function', {
-      allowReturnOutsideFunction: true,
-      allowAwaitOutsideFunction: true,
-        sourceType: 'module'
-    })
+    let err = checkSyntax(_text, 'Execution Function', { allowReturn: true })
     if (err) _syntax = '```' + err + '```\n\n'
     _return = e
   } finally {

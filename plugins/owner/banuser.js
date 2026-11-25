@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -23,7 +23,7 @@ let handler = async (m, { conn, text }) => {
         if (m.mentionedJid.length > 0) {
             who = m.mentionedJid[0];
         } else {
-            let cleanedNumber = text.replace(/\D/g, ''); 
+            let cleanedNumber = text.replace(/\D/g, '');
             who = `${cleanedNumber}@s.whatsapp.net`;
         }
     } else {

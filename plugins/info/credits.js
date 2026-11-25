@@ -9,14 +9,14 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
   izin tertulis dari developer. Jangan hapus kredit ini.
 */
 
-import { AIRich } from 'elyra-baileys'
+import { AIRich } from '../../lib/airich.js'
 
 const LOGO_KOMUNITAS = 'https://raw.githubusercontent.com/Lynxcode-id/picture/main/1793014664390.jpeg'
 const LOGO_BOT = 'https://raw.githubusercontent.com/its-dinda/image/main/1793884065104.jpeg'
@@ -24,7 +24,7 @@ const LOGO_BOT = 'https://raw.githubusercontent.com/its-dinda/image/main/1793884
 const REPO_URL = 'https://github.com/Lynx-decode/ERINE-AI'
 const ELYRINE_URL = 'https://github.com/Lynxcode-id/elyrine'
 const BASE_URL = 'https://github.com/ShirokamiRyzen/Nao-MD'
-const BAILEYS_URL = 'https://github.com/Lynxcode-id/elyra-baileys'
+const BAILEYS_URL = 'https://github.com/Lynxcode-id/elyrine-baileys'
 
 const CH_DEV = 'https://whatsapp.com/channel/0029VbAnuii6GcGCu73oep1i'
 const CH_CODE = 'https://whatsapp.com/channel/0029VbCUDdOHFxOyVb2Hfe2X'
@@ -44,7 +44,7 @@ const GITHUB_REPOS = [
   {
     name: 'Elyra Baileys',
     owner: 'Lynxcode-id',
-    repo: 'elyra-baileys'
+    repo: 'elyrine-baileys'
   },
   {
     name: 'Nao-MD',
@@ -128,6 +128,7 @@ async function getGitHubContributors(owner, repo) {
 
     GITHUB_CACHE.set(key, result)
     return result
+
   } catch (error) {
     console.error(
       `[CREDITS GITHUB] ${key}:`,
@@ -195,6 +196,7 @@ async function createGitHubSection() {
 }
 
 const sections = [
+
   [
     '🌷 *ELYRINE MD — PROJECT CREDITS*',
     '',
@@ -572,6 +574,7 @@ const sections = [
     '',
     'Thank you for respecting open-source development. 💐'
   ]
+
 ].map(section => section.join('\n'))
 
 async function sendFallback(conn, m, content) {
@@ -669,6 +672,7 @@ const handler = async (m, { conn, usedPrefix }) => {
     })
 
     await m.react('💐').catch(() => {})
+
   } catch (error) {
     console.error(
       '[ELYRINE CREDITS]',

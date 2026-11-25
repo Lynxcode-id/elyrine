@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -17,6 +17,7 @@
 */
 
 let handler = async (m, { conn, args, usedPrefix, command }) => {
+
   await conn.groupUpdateSubject(m.chat, `${args.join(" ")}`);
   m.reply('Sukses mengganti nama group')
 }

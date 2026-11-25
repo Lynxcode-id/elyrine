@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -30,6 +30,7 @@ import { errorText, limitText } from './lib/respon.js'
 import { getTier, quotaOf, isLimitEnabled, isVipActive, isPremiumActive, getLimitCfg, nextResetAt, formatCountdown } from './lib/limit.js'
 import { isChannelJid, isManagedChannel } from './lib/channel.js'
 import { extractButtonId } from './lib/buttonresponse.js'
+import { sendWelcomeSound } from './lib/sambutan.js'
 
 const isNumber = x => typeof x === 'number' && !isNaN(x)
 const delay = ms => isNumber(ms) && new Promise(resolve => setTimeout(resolve, ms))
@@ -54,11 +55,6 @@ const hideKeys = text => {
     for (const key of Object.values(global.APIKeys || {})) if (key) text = text.split(key).join('#HIDDEN#')
     return text
 }
-
-/**
- * Handle messages upsert
- * @param {import('elyra-baileys').BaileysEventMap<unknown>['messages.upsert']} groupsUpdate 
- */
 
 export async function handler(chatUpdate) {
     if (!chatUpdate) return
@@ -160,7 +156,7 @@ export async function handler(chatUpdate) {
             console.error(e)
         }
         if (opts['pconly'] && m.chat.endsWith('g.us')) return
-        if (opts['gconly'] && !m.chat.endsWith('g.us')) return
+        if (opts['gconly'] && !m.chat.endsWith('g.us') && !isChannelJid(m.chat)) return
         if (typeof m.text !== 'string') m.text = ''
         if (!m.text) {
             const btnId = extractButtonId(m.message)
@@ -457,10 +453,6 @@ export async function handler(chatUpdate) {
             await conn.readMessages([m.key]).catch(() => { })
     }
 }
-/**
- * Handle groups participants update
- * @param {import('elyra-baileys').BaileysEventMap<unknown>['group-participants.update']} groupsUpdate 
- */
 export async function participantsUpdate({ id, participants, action, simulate = false }) {
     if (opts['self']) return
     if (this.isInit && !simulate) return
@@ -473,6 +465,7 @@ export async function participantsUpdate({ id, participants, action, simulate = 
         case 'remove':
             if (chat.welcome) {
                 let groupMetadata = (conn.chats[id] || {}).metadata || await this.groupMetadata(id)
+                let welcomeSent = false
 
                 for (let user of participants) {
                     if (action === 'add') {
@@ -511,7 +504,7 @@ export async function participantsUpdate({ id, participants, action, simulate = 
                             pp = await Promise.race([uploadPomf(ppB), delay(12000).then(() => pps)]).catch(() => pps)
                         }
                     } catch (err) {
-                        console.log('[AVATAR ERROR]', err)
+                        console.log('[AVATAR]', err?.cause?.code || err?.message || err)
                     }
 
                     const safeName = async () => {
@@ -533,23 +526,49 @@ export async function participantsUpdate({ id, participants, action, simulate = 
                     text = (
                         action === 'add'
                             ? (chat.sWelcome || this.welcome || 'Welcome, @user!')
-                                .replace('@subject', gcname)
-                                .replace('@desc', groupMetadata.desc || '')
                             : (chat.sBye || this.bye || 'Bye, @user!')
-                    ).replace('@user', '@' + (userJid.split('@')[0] || username))
+                    )
+                        .replace(/@namegc|@subject/g, gcname)
+                        .replace(/@deskgc|@desc/g, groupMetadata.desc || '')
+                        .replace(/@member/g, String(gcMem))
+                        .replace(/@user/g, '@' + (userJid.split('@')[0] || username))
 
                     const wel = `${APIs.ryzumi}/api/image/welcome?username=${encodeURIComponent(username)}&group=${encodeURIComponent(gcname)}&avatar=${encodeURIComponent(pp || '')}&bg=${encodeURIComponent(welcomeBg)}&member=${gcMem}`
                     const lea = `${APIs.ryzumi}/api/image/leave?username=${encodeURIComponent(username)}&group=${encodeURIComponent(gcname)}&avatar=${encodeURIComponent(pp || '')}&bg=${encodeURIComponent(leaveBg)}&member=${gcMem}`
 
+                    let sent = false
+                    let imgBuf = null
                     try {
-                        await this.sendMessage(id, {
-                            image: { url: action === 'add' ? wel : lea },
-                            caption: text,
-                            contextInfo: { mentionedJid: [userJid] },
-                        })
+                        const r = await fetch(action === 'add' ? wel : lea, { signal: AbortSignal.timeout(15000) })
+                        if (r.ok) {
+                            const b = Buffer.from(await r.arrayBuffer())
+                            if (b.length > 1000) imgBuf = b
+                        }
                     } catch (e) {
-                        console.log('[MESSAGE SEND ERROR]', e)
+                        console.log('[WELCOME IMAGE]', e?.cause?.code || e?.message || e)
                     }
+                    if (imgBuf) {
+                        try {
+                            await this.sendMessage(id, { image: imgBuf, caption: text, mentions: [userJid] })
+                            sent = true
+                        } catch (e) {
+                            console.log('[WELCOME SEND IMAGE]', e?.message || e)
+                        }
+                    }
+                    if (!sent) {
+                        try {
+                            await this.sendMessage(id, { text, mentions: [userJid] })
+                            sent = true
+                        } catch (e) {
+                            console.log('[WELCOME SEND TEXT]', e?.message || e)
+                        }
+                    }
+                    console.log('[WELCOME]', id, userJid, sent ? 'terkirim' : 'gagal')
+                    if (sent) welcomeSent = true
+                }
+                if (action === 'add' && welcomeSent) {
+                    await delay(1500)
+                    await sendWelcomeSound(this, id).catch(e => console.log('[SAMBUTAN]', e?.message || e))
                 }
             } else {
                 console.log('[WELCOME SYSTEM DISABLED]')
@@ -580,10 +599,6 @@ export async function participantsUpdate({ id, participants, action, simulate = 
     }
 }
 
-/**
- * Handler groups update
- * @param {import('elyra-baileys').BaileysEventMap<unknown>['groups.update']} groupsUpdate 
- */
 export async function groupsUpdate(groupsUpdate) {
     if (opts['self']) return
     for (const groupUpdate of groupsUpdate) {

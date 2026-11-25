@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -39,7 +39,6 @@ import { spawn } from 'child_process'
 import { tmpdir } from 'os'
 import { format } from 'util'
 import yargs from 'yargs/yargs'
-import syntaxerror from 'syntax-error'
 import chalk from 'chalk'
 import { Low, JSONFile } from 'lowdb'
 import { startBot, protoType, serialize, ROOT } from './lib/function.js'
@@ -129,8 +128,6 @@ function finalizePlugin(key, mod) {
 
 async function loadPlugin(key, bust = false) {
   const file = join(pluginFolder, key)
-  const err = syntaxerror(readFileSync(file), key, { sourceType: 'module', allowAwaitOutsideFunction: true })
-  if (err) { console.error(chalk.red(`syntax error '${key}'\n${format(err)}`)); return false }
   try {
     const mod = await import(pathToFileURL(file).href + (bust ? `?update=${Date.now()}` : ''))
     global.plugins[key] = finalizePlugin(key, mod)

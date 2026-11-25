@@ -10,15 +10,15 @@
 
 ### WhatsApp Automation System · Multi-Device · Node.js ESM
 
-<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&amp;weight=600&amp;size=17&amp;duration=2800&amp;pause=900&amp;color=46D98A&amp;center=true&amp;vCenter=true&amp;width=820&amp;height=34&amp;lines=Modular+WhatsApp+Automation;Powered+by+elyra-baileys;AI+%E2%80%A2+Downloader+%E2%80%A2+Media+%E2%80%A2+Channel;Built+with+Node.js+%26+ES+Modules" alt="Animated project tagline" />
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&amp;weight=600&amp;size=17&amp;duration=2800&amp;pause=900&amp;color=46D98A&amp;center=true&amp;vCenter=true&amp;width=820&amp;height=34&amp;lines=Modular+WhatsApp+Automation;Powered+by+elyrine-baileys;AI+%E2%80%A2+Downloader+%E2%80%A2+Media+%E2%80%A2+Channel;Built+with+Node.js+%26+ES+Modules" alt="Animated project tagline" />
 
 **An extensible WhatsApp automation project powered by 
-`elyra-baileys`.**
+`elyrine-baileys`, Baileys baru yang dioptimalkan khusus untuk ELYRINE.**
 
 ELYRINE menggabungkan AI, pencarian, downloader, pengolahan media, sticker maker, utilitas grup, sistem limit dan membership, manajemen saluran, serta kontrol owner dalam satu ekosistem bot WhatsApp Multi-Device.
 
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![Engine](https://img.shields.io/badge/Engine-elyra--baileys%201.2.5-7657d5?style=for-the-badge)](https://github.com/Lynxcode-id/elyra-baileys)
+[![Engine](https://img.shields.io/badge/Engine-elyrine--baileys-7657d5?style=for-the-badge)](https://github.com/Lynxcode-id/elyrine-baileys)
 [![Version](https://img.shields.io/badge/Version-1.0.0-ec4899?style=for-the-badge)](package.json)
 [![Platform](https://img.shields.io/badge/Platform-WhatsApp%20Multi--Device-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](https://www.whatsapp.com/)
 [![License](https://img.shields.io/badge/License-Source--Available%20Non--Commercial-orange?style=for-the-badge)](LICENSE)
@@ -47,6 +47,15 @@ ELYRINE menggabungkan AI, pencarian, downloader, pengolahan media, sticker maker
 
 ---
 
+## Prinsip ELYRINE
+
+- **No obfuscation.** Tidak ada kode yang diobfuscate atau disamarkan supaya susah dibaca. Seluruh source terbuka, rapi, dan bisa diaudit sendiri.
+- **No autofollow saluran & auto join grup.** Bot tidak mengikuti saluran atau masuk grup secara otomatis. Join hanya terjadi kalau owner menjalankan perintahnya sendiri.
+- **No backdoor 100%.** Tidak ada akses jarak jauh tersembunyi, `eval`, atau `new Function` di source. Perintah eksekusi seperti `exec`, `exec2`, `addplugin`, dan `restart` hanya bisa dipakai owner.
+- **Baileys use: `elyrine-baileys`.** Baileys baru yang dioptimalkan khusus untuk ELYRINE, menggantikan `elyra-baileys` lama.
+- **Tanpa kredensial bawaan.** Apikey dan token dikosongkan. Isi sendiri di `config.js` sesuai kebutuhan.
+- **Kredit tetap utuh.** Lisensi ELYRINE Source-Available Non-Commercial berlaku. Dilarang menjual, menyewakan, atau merebrand tanpa izin developer, dan jangan hapus kredit.
+
 ## Tentang ELYRINE
 
 **ERINE-AI • ELYRINE** adalah framework bot WhatsApp Multi-Device yang dikembangkan menggunakan **Node.js dengan standar ES Modules (ESM)**. Proyek ini dirancang sebagai sistem otomasi modular: fitur dipisahkan ke dalam plugin, fungsi inti dikelola melalui library internal, sedangkan koneksi WhatsApp ditangani oleh engine **`elyra-baileys`**, custom fork Baileys yang dikembangkan untuk kebutuhan ekosistem ERINE-AI.
@@ -73,7 +82,7 @@ Tujuan pengembangannya adalah menyediakan satu fondasi bot yang:
 | Module system | ES Modules (`"type": "module"`) |
 | Entry point | `index.js` |
 | Core process | `main.js` dan `handler.js` |
-| WhatsApp engine | [`elyra-baileys`](https://github.com/Lynxcode-id/elyra-baileys) `1.2.5` |
+| WhatsApp engine | [`elyrine-baileys`](https://github.com/Lynxcode-id/elyrine-baileys) `latest` (Baileys baru, dioptimalkan khusus untuk ELYRINE; menggantikan `elyra-baileys` lama) |
 | Session storage | SQLite melalui `better-sqlite3` |
 | Bot data storage | JSON database melalui `lowdb` |
 | Plugin aktif pada arsip ini | **185 file JavaScript** |
@@ -866,7 +875,7 @@ Gunakan validasi input, pembatasan hak akses, penanganan error, serta pemeriksaa
 |---|---|
 | Node.js | Runtime JavaScript server-side |
 | ES Modules | Sistem modul project |
-| `elyra-baileys` | Engine WhatsApp Multi-Device |
+| `elyrine-baileys` | Engine WhatsApp Multi-Device, Baileys baru yang dioptimalkan khusus untuk ELYRINE |
 | `better-sqlite3` | Penyimpanan autentikasi/sesi SQLite |
 | `lowdb` | Database JSON untuk data bot |
 | `sharp` | Pemrosesan dan transformasi gambar |
@@ -899,15 +908,17 @@ Versi dan daftar dependency lengkap selalu mengacu pada [`package.json`](package
 | Project | Kontributor/Pembuat | Keterangan |
 |---|---|---|
 | [Nao-MD / RyzumiMD-ESM](https://github.com/ShirokamiRyzen/Nao-MD) | Fatih Firdaus (ShirokamiRyzen) | Base project yang menjadi salah satu fondasi pengembangan; periksa lisensi upstream |
-| [Elyra Baileys](https://github.com/Lynxcode-id/elyra-baileys) | Lynx Decode / Elyra Labs dan kontributor upstream | Custom Baileys engine untuk ekosistem ERINE-AI |
+| [Elyrine Baileys](https://github.com/Lynxcode-id/elyrine-baileys) | Lynx Decode / Elyra Labs dan kontributor upstream | Baileys baru yang dioptimalkan khusus untuk ELYRINE; engine yang dipakai saat ini |
+| [Elyra Baileys](https://github.com/Lynxcode-id/elyra-baileys) | Lynx Decode / Elyra Labs dan kontributor upstream | Baileys lama; dasar dari Elyrine Baileys dan tidak lagi dipakai di ELYRINE |
 
 ### Jalur fork engine
 
 ```text
-Elyra Baileys
-   └── @vanzxy/baileys
+Elyrine Baileys (baru, khusus ELYRINE)
+└── Elyra Baileys (lama)
+    └── @vanzxy/baileys
         └── @itsliaaa/baileys
-             └── WhiskeySockets/Baileys
+            └── WhiskeySockets/Baileys
 ```
 
 ### Kontributor engine dan ekstensi
@@ -972,7 +983,8 @@ Untuk pertanyaan teknis, laporan bug, permintaan izin penggunaan komersial, atau
 | **WhatsApp** | [+62 813-6213-3135](https://wa.me/6281362133135) |
 | **GitHub** | [Lynx-decode](https://github.com/Lynx-decode) |
 | **Repository ELYRINE** | [Lynx-decode/ERINE-AI](https://github.com/Lynx-decode/ERINE-AI) |
-| **Elyra Baileys** | [Lynxcode-id/elyra-baileys](https://github.com/Lynxcode-id/elyra-baileys) |
+| **Elyrine Baileys** | [Lynxcode-id/elyrine-baileys](https://github.com/Lynxcode-id/elyrine-baileys) |
+| **Elyra Baileys (lama)** | [Lynxcode-id/elyra-baileys](https://github.com/Lynxcode-id/elyra-baileys) |
 
 ### Kanal komunitas dan pengembangan
 

@@ -9,14 +9,14 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
   izin tertulis dari developer. Jangan hapus kredit ini.
 */
 
-import { AIRich } from 'elyra-baileys'
+import { AIRich } from '../../lib/airich.js'
 
 const LOGO_KOMUNITAS = 'https://raw.githubusercontent.com/Lynxcode-id/picture/main/1793014664390.jpeg'
 const LOGO_BOT = 'https://raw.githubusercontent.com/its-dinda/image/main/1793884065104.jpeg'
@@ -70,7 +70,7 @@ let handler = async (m, { conn, usedPrefix }) => {
     '> *Fast response:* handler dan plugin dibuat supaya alur pesan tetap singkat',
     '> *Tahan banting:* error satu plugin tidak menjatuhkan seluruh bot',
     '> *Tidak overlimit:* helper, cache, dan database dipakai seperlunya agar tidak kerja berulang',
-    '> *Fleksibel:* berjalan di elyra-baileys dengan Native Flow, Carousel, dan AIRich',
+    '> *Fleksibel:* berjalan di elyrine-baileys dengan Native Flow, Carousel, dan AIRich',
     '> *Mudah di-maintenance:* koneksi, handler, database, helper, dan plugin dipisah dengan jelas',
     '> *Siap dikembangkan:* fitur baru tidak perlu mengacak-acak core bot',
     '',

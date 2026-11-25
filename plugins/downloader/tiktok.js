@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -17,47 +17,56 @@
 */
 
 import axios from 'axios'
-import sharp from 'sharp'
+import { scrapeTikTok, TIKDOWN_UA, TIKDOWN_HOST } from '../../scrape/tikdown.js'
 import { sendVideoBadge } from '../../lib/videobadge.js'
+import { omdown, fetchBuffer as omFetch, firstValid as omFirstValid } from '../../scrape/omdown.js'
 
-const API = (global.APIs?.lynxapis || 'https://lynxapis.my.id') + '/api/downloader/tiktok-v4'
 const TT_REGEX = /^(https?:\/\/)?((www|m|vm|vt)\.)?tiktok\.com\/\S+/i
 const MAX_SIZE = 80 * 1024 * 1024
-const MAX_PHOTOS = 20
-const HEADERS = {
-  'User-Agent': 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Mobile Safari/537.36',
-  Referer: 'https://www.tiktok.com/'
+
+const absUrl = (u, base = TIKDOWN_HOST) => {
+  const s = String(u ?? '').trim()
+  if (!s || s === 'undefined' || s === 'null') return null
+  try {
+    const url = new URL(s, base)
+    return /^https?:$/.test(url.protocol) ? url.href : null
+  } catch { return null }
+}
+
+const describeFetchError = (e, u) => {
+  let host = ''
+  try { host = new URL(u).host } catch { }
+  const status = e.response?.status
+  return `${e.message}${e.code ? ` [${e.code}]` : ''}${status ? ` HTTP ${status}` : ''}${host ? ` @ ${host}` : ''}`
 }
 
 const fetchBuffer = async url => {
-  const res = await axios.get(url, { responseType: 'arraybuffer', timeout: 120000, maxContentLength: MAX_SIZE, maxBodyLength: MAX_SIZE, headers: HEADERS })
-  const buf = Buffer.from(res.data)
-  if (!buf.length) throw new Error('File kosong.')
-  return buf
-}
-
-const isVideo = b => b.length > 12 && (b.slice(4, 8).toString() === 'ftyp' || b.slice(0, 4).toString('hex') === '1a45dfa3')
-const isImage = b => b.length > 12 && (
-  (b[0] === 0xff && b[1] === 0xd8) ||
-  b.slice(1, 4).toString() === 'PNG' ||
-  (b.slice(0, 4).toString() === 'RIFF' && b.slice(8, 12).toString() === 'WEBP') ||
-  b.slice(4, 8).toString() === 'ftyp'
-)
-
-const toJpeg = async b => {
-  try { return await sharp(b).rotate().jpeg({ quality: 92 }).toBuffer() } catch { return (b[0] === 0xff && b[1] === 0xd8) ? b : null }
-}
-
-async function fetchValid(urls, check) {
-  let lastErr
-  for (const u of urls.filter(Boolean)) {
-    try {
-      const buf = await fetchBuffer(u)
-      if (check(buf)) return buf
-      lastErr = new Error('Isi file bukan media valid.')
-    } catch (e) { lastErr = e }
+  const u = absUrl(url)
+  if (!u) throw new Error(`URL media tidak valid: "${String(url ?? '').slice(0, 80)}"`)
+  try {
+    const res = await axios.get(u, {
+      responseType: 'arraybuffer', timeout: 120000, maxContentLength: MAX_SIZE, maxBodyLength: MAX_SIZE,
+      headers: { 'User-Agent': TIKDOWN_UA, Referer: `${TIKDOWN_HOST}/` }
+    })
+    const buf = Buffer.from(res.data)
+    if (!buf.length) throw new Error('File kosong.')
+    return buf
+  } catch (e) {
+    throw new Error(describeFetchError(e, u))
   }
-  throw lastErr || new Error('Tidak ada URL media.')
+}
+
+async function fetchBestVideo(videos) {
+  const errs = []
+  for (const v of videos) {
+    try {
+      return { buffer: await fetchBuffer(v.url), picked: v }
+    } catch (e) {
+      errs.push(`${v.label}: ${e.message}`)
+      console.error(`[TIKDOWN] video "${v.label}" gagal/timeout, coba kualitas lain:`, e.message, '| url:', String(v.url).slice(0, 120))
+    }
+  }
+  throw new Error(errs.length ? `Video gagal diunduh (${errs.join(' | ')})` : 'Tidak ada video untuk diunduh.')
 }
 
 function buildCaption(d) {
@@ -65,13 +74,43 @@ function buildCaption(d) {
     '*[ Tiktok Downloader ]*',
     '',
     `• Nickname: ${d.author || '-'}`,
-    `• Type: ${d.type || '-'}`,
-    `• Like: ${d.stats?.likes ?? '-'}`,
-    `• Comment: ${d.stats?.comments ?? '-'}`,
-    `• Share: ${d.stats?.shares ?? '-'}`
+    `• Views: ${d.stats?.views ?? '-'}`,
+    `• Like: ${d.stats?.likes ?? '-'}`
   ]
   if (d.caption) lines.push('', d.caption)
   return lines.join('\n')
+}
+
+async function prefetchTikdown(url) {
+  const d = await scrapeTikTok(url)
+  const out = { caption: buildCaption(d), images: [], video: null, audio: null, id: d.id }
+  for (const img of d.images) {
+    try { out.images.push(await fetchBuffer(img.url)) }
+    catch (e) { console.error('[TIKDOWN] foto gagal:', e.message) }
+  }
+  if (d.videos.length) {
+    try { out.video = (await fetchBestVideo(d.videos)).buffer }
+    catch (e) { if (!d.images.length) throw e; console.error('[TIKDOWN] video gagal:', e.message) }
+  }
+  if (d.audio?.url) out.audio = await fetchBuffer(d.audio.url).catch(e => { console.error('[TIKDOWN] audio gagal:', e.message); return null })
+  if (!out.images.length && !out.video) throw new Error('Semua media gagal diunduh.')
+  return out
+}
+
+async function prefetchOmdown(url) {
+  const { data, cookie, videos, audios, photos } = await omdown(url)
+  const out = { caption: buildCaption({ author: data.author || data.uploader || data.nickname, stats: data.stats, caption: data.title || data.caption }), images: [], video: null, audio: null, id: data.id }
+  for (const u of photos) {
+    try { out.images.push(await omFetch(u, cookie, 'image')) }
+    catch (e) { console.error('[OMDOWN] foto gagal:', e.message) }
+  }
+  if (videos.length) {
+    try { out.video = (await omFirstValid(videos, cookie, 'video')).buf }
+    catch (e) { if (!out.images.length) throw e; console.error('[OMDOWN] video gagal:', e.message) }
+  }
+  if (audios.length) out.audio = await omFirstValid(audios, cookie, 'audio').then(r => r.buf).catch(() => null)
+  if (!out.images.length && !out.video) throw new Error('Semua media gagal diunduh.')
+  return out
 }
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
@@ -81,60 +120,65 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
   await m.react('⏳').catch(() => { })
 
-  let d
+  let media, engine = 'TikDown'
   try {
-    const { data } = await axios.get(API, { params: { url }, timeout: 60000 })
-    if (!data?.status || !data?.data) throw new Error(data?.message || 'API tidak mengembalikan data.')
-    d = data.data
-  } catch (e) {
-    await m.react('❌').catch(() => { })
-    return m.gagal(`Gagal mengambil data TikTok: ${e.response?.data?.message || e.message}`, 'Lynx Apis')
+    media = await prefetchTikdown(url)
+  } catch (e1) {
+    console.error('[TIKDOWN] gagal, pakai fallback Omdown:', e1.message)
+    try {
+      media = await prefetchOmdown(url)
+      engine = 'Omdown'
+    } catch (e2) {
+      console.error('[OMDOWN] fallback gagal:', e2.message)
+      await m.react('❌').catch(() => { })
+      return m.gagal(`Gagal mengambil video.\n• TikDown: ${e1.message}\n• Omdown: ${e2.message}`, 'TikDown')
+    }
   }
 
-  const caption = buildCaption(d)
+  const { caption, images, video, audio, id } = media
 
   try {
-    if (d.type === 'photo' || (!d.video_no_wm && !d.video && d.photos?.length)) {
-      const urls = (d.photos || []).map(p => p.download_url || p.preview).filter(Boolean).slice(0, MAX_PHOTOS)
-      if (!urls.length) throw new Error('Foto tidak ditemukan.')
-
-      const raw = await Promise.all((d.photos || []).slice(0, MAX_PHOTOS).map(p =>
-        fetchValid([p.download_url, p.preview], isImage).catch(e => { console.error('[TIKTOK] foto gagal:', e.message); return null })
-      ))
-      const buffers = (await Promise.all(raw.filter(Boolean).map(toJpeg))).filter(Boolean)
-      if (!buffers.length) throw new Error('Semua foto gagal diunduh.')
+    if (images.length) {
+      const items = images.map(image => ({ image }))
+      if (video) items.push({ video, mimetype: 'video/mp4' })
 
       let sent = 0
       try {
-        const r = await conn.sendAlbum(m.chat, buffers.map(image => ({ image })), { quoted: m })
+        const r = await conn.sendAlbum(m.chat, items, { quoted: m })
         sent = r?.sent || 0
-      } catch (e) { console.error('[TIKTOK] album error:', e.message) }
+      } catch (e) { console.error('[TIKDOWN] album error:', e.message) }
 
       if (!sent) {
-        for (const image of buffers) {
-          try { await conn.sendMessage(m.chat, { image }, { quoted: m }); sent++ } catch (e) { console.error('[TIKTOK] kirim foto error:', e.message) }
+        for (const item of items) {
+          try { await conn.sendMessage(m.chat, item, { quoted: m }); sent++ }
+          catch (e) { console.error('[TIKDOWN] kirim item error:', e.message) }
         }
       }
-      if (!sent) throw new Error('Foto terunduh tapi gagal terkirim ke WhatsApp.')
+      if (!sent) throw new Error('Media terunduh tapi gagal terkirim ke WhatsApp.')
 
       await m.react('✅').catch(() => { })
-      return m.sukses(caption)
+      return
     }
-
-    const video = await fetchValid([d.video_no_wm, d.video], isVideo)
 
     try {
       await sendVideoBadge(conn, m.chat, video, { caption, quoted: m })
     } catch (e) {
-      console.error('[TIKTOK] badge gagal, kirim video biasa:', e.message)
+      console.error('[TIKDOWN] badge gagal, kirim video biasa:', e.message)
       await conn.sendMessage(m.chat, { video, caption, mimetype: 'video/mp4' }, { quoted: m })
     }
+
+    if (audio) {
+      try {
+        await conn.sendMessage(m.chat, { audio, mimetype: 'audio/mpeg', fileName: `${id || 'tiktok'}.mp3` }, { quoted: m })
+      } catch (e) { console.error('[TIKDOWN] audio gagal:', e.message) }
+    }
+
     await m.react('✅').catch(() => { })
   } catch (e) {
-    console.error('[TIKTOK]', e)
+    console.error('[TIKDOWN]', e)
     await m.react('❌').catch(() => { })
     const tooBig = /maxContentLength|exceeded/i.test(e.message)
-    return m.gagal(tooBig ? 'Ukuran file melebihi 80MB.' : `Gagal mengirim: ${e.message}`, 'TikTok')
+    return m.gagal(tooBig ? 'Ukuran file melebihi 80MB.' : `Gagal mengirim: ${e.message}`, engine)
   }
 }
 

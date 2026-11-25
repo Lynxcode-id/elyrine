@@ -9,14 +9,14 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
   izin tertulis dari developer. Jangan hapus kredit ini.
 */
 
-import { generateWAMessageContent, generateWAMessageFromContent, proto } from 'elyra-baileys'
+import { generateWAMessageContent, generateWAMessageFromContent, proto } from 'elyrine-baileys'
 import { getCustomThumb } from '../../lib/customthumb.js'
 
 let handler = async (m, { conn }) => {

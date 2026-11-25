@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -58,7 +58,7 @@ global.sfb = '-'
 global.qris = 'https://api.ryzumi.net/assets/images/qris.png'
 
 // Global respon elyrine..
-global.wait = [
+global.wait = global.proses = [
   '🌱 ERINE-AI',
   'Sedang memproses permintaanmu...',
   '',
@@ -108,6 +108,11 @@ global.APIs = {
   lynxapis: 'https://lynxapis.my.id',
   yonz: 'https://api.yonz.cloud',
   xrina: 'https://apiii-xrina.my.id',
+  nexray: 'https://api.nexray.eu.cc',
+  jerexd: 'https://api.jerexd.my.id',
+  jagoan: 'https://api.jagoanproject.com',
+  apicloud: 'https://api-cloud.my.id',
+  haidarxd: 'https://api.haidarxd.my.id',
 }
 
 // Set pake apikeylu sendiri ambil dari link web diatas global.APIs
@@ -117,6 +122,10 @@ global.APIKeys = {
   'https://catbox.moe': '2803f9fedb5557c59bd9378c4',
   'https://c.termai.cc': 'AIzaBj7z2z3xBjsk',
   'https://api.yonz.cloud': '6A98',
+  'https://api.jerexd.my.id': '',
+  'https://api.jagoanproject.com': '',
+  'https://lynxstore.my.id': '',
+  'https://api.haidarxd.my.id': '',
 }
 
 // Setelan Create Panel Pterodatyle
@@ -138,8 +147,47 @@ global.htka = '』––––––'
 global.lopr = 'Ⓟ'
 global.lolm = 'Ⓛ'
 global.htjava = '⫹⫺'
-global.autoFollowChannel = true
+global.autoFollowChannel = false
 global.multiplier = 0
+
+global.digitalocean = {
+  token: '',
+  region: 'sgp1',
+  image: 'ubuntu-22-04-x64',
+  tags: ['elyrine-bot'],
+  sellers: [],
+  plans: {
+    vps1g1c: { size: 's-1vcpu-1gb', ram: '1GB', cpu: '1 vCPU' },
+    vps2g1c: { size: 's-1vcpu-2gb', ram: '2GB', cpu: '1 vCPU' },
+    vps2g2c: { size: 's-2vcpu-2gb', ram: '2GB', cpu: '2 vCPU' },
+    vps4g2c: { size: 's-2vcpu-4gb', ram: '4GB', cpu: '2 vCPU' },
+    vps8g4c: { size: 's-4vcpu-8gb', ram: '8GB', cpu: '4 vCPU' }
+  }
+}
+
+global.vercel = {
+  token: process.env.VERCEL_TOKEN || '',
+  teamId: ''
+}
+
+global.linode = {
+  token: process.env.LINODE_TOKEN || '',
+  region: 'ap-south',
+  image: 'linode/ubuntu22.04'
+}
+
+const WA_BROWSER_PRESETS = {
+  macos:   ['Mac OS',  'Chrome', '14.4.1'],
+  android: ['Android', 'Chrome', '14.0.0'],
+  windows: ['Windows', 'Chrome', '10.0.22631'],
+  ubuntu:  ['Ubuntu',  'Chrome', '22.04.4']
+}
+const WA_BROWSER_PRESET = 'macOS'
+const WA_BROWSER_CUSTOM = null
+
+global.waBrowser = WA_BROWSER_CUSTOM
+  || WA_BROWSER_PRESETS[String(process.env.WA_BROWSER || WA_BROWSER_PRESET).toLowerCase()]
+  || WA_BROWSER_PRESETS.macos
 
 let file = fileURLToPath(import.meta.url)
 watchFile(file, () => {

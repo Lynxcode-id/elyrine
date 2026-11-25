@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -86,6 +86,7 @@ async function scanSource(rootDir) {
                     totalClean += stats.size
                     filesClean++
                 }
+
             } catch {
             }
         }
@@ -136,6 +137,7 @@ const handler = async (m, { conn }) => {
         await m.sukses(result)
 
         await m.react('💐').catch(() => {})
+
     } catch (err) {
         console.error('[SIZESC]', err?.stack || err)
 

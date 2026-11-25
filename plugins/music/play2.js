@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -19,7 +19,7 @@
 import path from 'path'
 import axios from 'axios'
 import yts from 'yt-search'
-import { AIRich } from 'elyra-baileys'
+import { AIRich } from 'elyrine-baileys'
 import { ffmpeg } from '../../lib/converter.js'
 import { ytmp3Api } from '../../lib/ytapi.js'
 

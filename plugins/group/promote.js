@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -21,6 +21,7 @@ let handler = async (m, { conn, participants }) => {
     if (!who || who == m.sender) throw 'Reply / tag yang ingin di promote'
     conn.groupParticipantsUpdate(m.chat, [who], 'promote')
         .then(_ => m.reply('Success'))
+
 }
 handler.help = ['promote @tag']
 handler.tags = ['group']

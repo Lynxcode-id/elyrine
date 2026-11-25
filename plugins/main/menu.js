@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -18,22 +18,70 @@
 
 import { promises } from 'fs'
 import { join } from 'path'
-import { generateWAMessageContent, generateWAMessageFromContent, proto } from 'elyra-baileys'
+import { generateWAMessageContent, generateWAMessageFromContent, prepareWAMessageMedia, proto } from 'elyrine-baileys'
 import { sendMenuAudio } from '../../lib/menuaudio.js'
 import moment from 'moment-timezone'
 import { limitSummary } from '../../lib/limit.js'
 import { getCustomThumb } from '../../lib/customthumb.js'
+import { getMenuStyle } from '../../lib/menustyle.js'
+import { sendRichMenu } from '../../lib/menurich.js'
+import { sendMenu3 } from '../../lib/menu3.js'
+import { runScope } from '../../lib/favicon.js'
 
 const GROUP_LINK = 'https://chat.whatsapp.com/Fk2geM46pu87FFE533a7uS?s=cl&p=a&iam=2'
 const DEFAULT_THUMB = 'https://raw.githubusercontent.com/its-dinda/image/main/1793839373037.jpeg'
-const BOT_TITLE = 'ERINE-AI • ELYRINE'
+const BOT_TITLE = 'ERINE-AI ~ 3ND PROJECT'
+const MENU_LP_URL = 'https://github.com/Lynxcode-id/elyrine'
 
 const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '')
 
-const FOOTER = 'ERINE-AI • ELYRINE'
-const MAX_CHUNK = 3000
+const FOOTER = 'ҽɾιɳҽ-αι 3ɳԃ'
+const MAX_CHUNK = 60000
 
-let handler = async (m, { conn, usedPrefix: _p, __dirname, args, isOwner }) => {
+const MENU_LP_IMG = 'https://raw.githubusercontent.com/its-dinda/image/main/1794457295780.jpeg'
+const MENU_LP_W = 1280
+const MENU_LP_H = 720
+let menuLpThumbCache = null
+
+async function fetchRawImage(url) {
+  const res = await fetch(url)
+  if (!res.ok) throw new Error('HTTP ' + res.status)
+  return Buffer.from(await res.arrayBuffer())
+}
+
+async function fetchRawImageViaLinkPreview(pageUrl) {
+  const { getLinkPreview } = await import('link-preview-js')
+  const preview = await getLinkPreview(pageUrl, { timeout: 8000 })
+  const img = Array.isArray(preview.images) && preview.images[0]
+  if (!img) throw new Error('link-preview-js tidak menemukan og:image')
+  return fetchRawImage(img)
+}
+
+async function getMenuLpThumb() {
+  if (menuLpThumbCache) return menuLpThumbCache
+  let raw = null
+  try {
+    raw = await fetchRawImage(MENU_LP_IMG)
+  } catch (e) {
+    console.error('[MENU] gagal ambil thumbnail utama, coba link-preview-js:', e && e.message ? e.message : e)
+    try {
+      raw = await fetchRawImageViaLinkPreview(MENU_LP_URL)
+    } catch (e2) {
+      console.error('[MENU] link-preview-js juga gagal:', e2 && e2.message ? e2.message : e2)
+      return null
+    }
+  }
+  try {
+    const sharp = (await import('sharp')).default
+    menuLpThumbCache = await sharp(raw).resize(MENU_LP_W, MENU_LP_H, { fit: 'cover', position: 'center' }).jpeg({ quality: 85 }).toBuffer()
+  } catch (e) {
+    console.error('[MENU] sharp gagal resize, pakai gambar asli:', e && e.message ? e.message : e)
+    menuLpThumbCache = raw
+  }
+  return menuLpThumbCache
+}
+
+const menuHandler = async (m, { conn, usedPrefix: _p, __dirname, args, isOwner }) => {
   try {
     const user = global.db.data.users[m.sender] || {}
     const name = m.pushName || await conn.getName(m.sender)
@@ -157,6 +205,51 @@ let handler = async (m, { conn, usedPrefix: _p, __dirname, args, isOwner }) => {
     }
     const sendPlain = text => conn.sendMessage(m.chat, { text, mentions: [m.sender] }, { quoted: fkon })
 
+    const sendListing = async (text) => {
+      const thumb = await getMenuLpThumb()
+      const withUrl = `${MENU_LP_URL}${'⁣'.repeat(500)}
+
+${text}`
+      const baseLinkPreview = {
+        'canonical-url': MENU_LP_URL,
+        canonicalUrl: MENU_LP_URL,
+        'matched-text': MENU_LP_URL,
+        matchedText: MENU_LP_URL,
+        title: BOT_TITLE,
+        description: FOOTER,
+        previewType: 0
+      }
+
+      if (thumb && typeof prepareWAMessageMedia === 'function') {
+        try {
+          const { imageMessage } = await prepareWAMessageMedia({ image: thumb }, { upload: conn.waUploadToServer, mediaTypeOverride: 'thumbnail-link' })
+          imageMessage.width = MENU_LP_W
+          imageMessage.height = MENU_LP_H
+          await conn.sendMessage(m.chat, {
+            text: withUrl,
+            linkPreview: { ...baseLinkPreview, jpegThumbnail: imageMessage.jpegThumbnail, highQualityThumbnail: imageMessage },
+            mentions: [m.sender]
+          }, { quoted: fkon })
+          return true
+        } catch (err) {
+          console.error('[MENU] kartu besar gagal, coba thumbnail kecil:', err && err.message ? err.message : err)
+        }
+      }
+
+      try {
+        await conn.sendMessage(m.chat, {
+          text: withUrl,
+          linkPreview: { ...baseLinkPreview, jpegThumbnail: thumb || undefined },
+          mentions: [m.sender]
+        }, { quoted: fkon })
+        return true
+      } catch (err) {
+        console.error('[MENU] listing kartu gagal total, pakai teks biasa:', err && err.message ? err.message : err)
+        await conn.sendMessage(m.chat, { text, mentions: [m.sender] }, { quoted: fkon })
+        return false
+      }
+    }
+
     const buildChunks = (list) => {
       const chunks = []
       let cur = head
@@ -179,10 +272,29 @@ let handler = async (m, { conn, usedPrefix: _p, __dirname, args, isOwner }) => {
     const raw = args.join(' ').trim()
     const q = norm(raw)
 
+    const style3 = getMenuStyle() === 3
+    const menu3Data = mode => ({
+      mode,
+      sender: m.sender,
+      name,
+      tier: ls.tier,
+      limit,
+      version: _package.version || '-',
+      plugins: plugins.length,
+      runtime,
+      totalUser: Object.keys(global.db.data.users || {}).length,
+      prefix: _p,
+      cats: all,
+      list: mode === 'all' ? all : []
+    })
+
     if (q === 'all') {
+      if (style3) {
+        await sendMenu3(conn, m, menu3Data('all'))
+        return
+      }
       const chunks = buildChunks(all)
-      await sendCard(chunks[0])
-      for (const c of chunks.slice(1)) await sendPlain(c)
+      for (const c of chunks) await sendListing(c)
       return
     }
 
@@ -190,9 +302,12 @@ let handler = async (m, { conn, usedPrefix: _p, __dirname, args, isOwner }) => {
       const found = all.find(c => norm(c.name) === q || c.alias === q || c.tags.includes(q)) ||
         all.find(c => q.length > 1 && norm(c.name).startsWith(q))
       if (found) {
+        if (style3) {
+          await sendMenu3(conn, m, { ...menu3Data('cat'), list: [found] })
+          return
+        }
         const chunks = buildChunks([found])
-        await sendCard(chunks[0])
-        for (const c of chunks.slice(1)) await sendPlain(c)
+        for (const c of chunks) await sendListing(c)
         return
       }
       let best = null
@@ -209,8 +324,33 @@ let handler = async (m, { conn, usedPrefix: _p, __dirname, args, isOwner }) => {
         `\n  ── Kategori Tersedia\n\n` +
         all.map(c => `  𖹭 ${c.name}`).join('\n') +
         `\n\n  Lihat semua dengan ${_p}menu all`
-      await sendCard(text)
+      await sendPlain(text)
       return
+    }
+
+    if (style3) {
+      const ok3 = await sendMenu3(conn, m, menu3Data('main'))
+      if (ok3) return
+    }
+
+    if (getMenuStyle() === 2) {
+      const ok = await sendRichMenu(conn, m, {
+        bot: global.namebot || 'ERINE-AI',
+        ver: _package.version || '-',
+        name,
+        membership,
+        limit,
+        uptime: process.uptime(),
+        plugins: plugins.length,
+        prefix: _p,
+        lprem,
+        llim,
+        cats: all
+      })
+      if (ok) {
+        await sendMenuAudio(conn, m.chat, m)
+        return
+      }
     }
 
     const text = head +
@@ -228,15 +368,18 @@ let handler = async (m, { conn, usedPrefix: _p, __dirname, args, isOwner }) => {
       `\n\n  Find more with ${_p}menu <category>`
     await sendCard(text)
     await sendMenuAudio(conn, m.chat, m)
+
   } catch (e) {
     conn.reply(m.chat, 'Maaf, menu sedang error', m)
     throw e
   }
 }
 
+let handler = (m, ctx) => runScope('menu', () => menuHandler(m, ctx))
+
 handler.help = ['menu']
 handler.tags = ['main']
-handler.command = /^(menu|help|\?)$/i
+handler.command = /^(menu)$/i
 handler.register = true
 handler.exp = 3
 

@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -21,6 +21,7 @@ import { promisify } from 'util'
 let exec = promisify(_exec).bind(cp)
 
 let handler = async (m, { conn, isROwner, usedPrefix, command, text }) => {
+
     if (!isROwner) return
     await m.react('🕓')
     let ar = Object.keys(plugins)

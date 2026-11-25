@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -19,7 +19,7 @@
 import fs from 'fs'
 import path from 'path'
 import assert from 'assert'
-import syntaxError from 'syntax-error'
+import { checkSyntax } from './lib/syntax.js'
 const roots = ['.', 'lib', 'plugins']
 const files = []
 const walk = (d, deep) => {
@@ -32,6 +32,7 @@ const walk = (d, deep) => {
 }
 walk('.', false); walk('lib', true); walk('plugins', true)
 for (const f of files) {
-  assert.ifError(syntaxError(fs.readFileSync(f, 'utf8'), f, { sourceType: 'module', allowReturnOutsideFunction: true, allowAwaitOutsideFunction: true }))
+  const err = checkSyntax(fs.readFileSync(f, 'utf8'), f, { allowReturn: true })
+  assert.ok(!err, err)
 }
 console.log(`☑️ ${files.length} file OK`)

@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -17,8 +17,8 @@
 */
 
 import axios from 'axios'
-import { ytmp3Api } from '../../lib/ytapi.js'
 
+const API = (global.APIs?.lynxapis || 'https://lynxapis.my.id') + '/api/downloader/ytmp3'
 const MAX_SIZE = 50 * 1024 * 1024
 const YT_REGEX = /^(https?:\/\/)?((www|m|music)\.)?(youtube\.com|youtu\.be)\/\S+/i
 
@@ -31,10 +31,13 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
   let info
   try {
-    info = await ytmp3Api(url)
+    const { data } = await axios.get(API, { params: { url }, timeout: 60000 })
+    if (!data?.status || !data?.result?.download_url) throw new Error(data?.message || 'API tidak mengembalikan link download.')
+    info = data.result
   } catch (e) {
     await m.react('❌').catch(() => { })
-    return m.gagal(`Gagal mengambil audio: ${e.message}`, 'Theresav')
+    const msg = e.response?.data?.message || e.message
+    return m.gagal(`Gagal mengambil audio: ${msg}`, 'Lynx Apis')
   }
 
   let audio
@@ -49,7 +52,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   } catch (e) {
     await m.react('❌').catch(() => { })
     const tooBig = /maxContentLength|exceeded/i.test(e.message)
-    return m.gagal(tooBig ? 'Ukuran audio melebihi 50MB.' : `Gagal mengunduh audio: ${e.message}`, 'Theresav')
+    return m.gagal(tooBig ? 'Ukuran audio melebihi 50MB.' : `Gagal mengunduh audio: ${e.message}`, 'Lynx Apis')
   }
 
   const safeName = String(info.title || 'audio').replace(/[\\/:*?"<>|]+/g, ' ').trim().slice(0, 80)
@@ -62,7 +65,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   await m.react('✅').catch(() => { })
   await m.sukses([
     `♡ Judul : ${info.title || '-'}`,
-    `♡ Link : ${url}`,
+    `♡ Link : ${info.url || url}`,
     `♡ Format : MP3`
   ].join('\n'))
 }

@@ -9,20 +9,13 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
   izin tertulis dari developer. Jangan hapus kredit ini.
 */
 
-/**
- * ✧ Name     : fake gc ios
- * ✧ Creator  : Rin imup
- * ✧ Category : Canvas
- * ✧ Sumber   : https://whatsapp.com/channel/0029Vb6EHtR5Ui2gHMW9zX2x
- * (credit asli)
- */
 import { createCanvas, loadImage, GlobalFonts } from '@napi-rs/canvas'
 import { existsSync, mkdirSync } from 'node:fs'
 import { writeFile } from 'node:fs/promises'

@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -18,34 +18,31 @@
 
 import fs from 'fs'
 import moment from 'moment-timezone'
-import { getCustomThumb, getCustomThumbSmall } from '../../lib/customthumb.js'
-import { fetchWithTimeout } from '../../lib/http.js'
+import nodeFetch from 'node-fetch'
+import { LRU } from '../../lib/lru.js'
+import { getCustomThumb, getCustomThumbSmall } from '../../lib/customthumbfake.js'
+import { buildSquareLinkPreview } from '../../lib/linkpreview.js'
+import { patchFavicon } from '../../lib/favicon.js'
 const defaultThumb = fs.readFileSync("./src/erine.webp")
-let thumbPath = defaultThumb
+global.fetch = nodeFetch
+global.fs = fs
 
 const DEFAULT_PP = './src/avatar_contact.png'
-const PP_TTL = 30 * 60 * 1000
-const ppCache = new Map()
+const ppCache = new LRU(500, 30 * 60 * 1000)
+const ppFlight = new Set()
 function getPP(conn, jid) {
-    let e = ppCache.get(jid)
-    const now = Date.now()
-    if (e && now - e.t < PP_TTL) return e.url
-    if (!e) {
-        e = { url: DEFAULT_PP, t: 0, pending: false }
-        ppCache.set(jid, e)
-        while (ppCache.size > 300) ppCache.delete(ppCache.keys().next().value)
+    const hit = ppCache.get(jid)
+    if (hit) return hit
+    if (!ppFlight.has(jid)) {
+        ppFlight.add(jid)
+        Promise.resolve(conn.profilePictureUrl(jid, 'image')).then(
+            url => ppCache.set(jid, url || DEFAULT_PP),
+            () => ppCache.set(jid, DEFAULT_PP, 5 * 60 * 1000)
+        ).finally(() => ppFlight.delete(jid))
     }
-    if (!e.pending) {
-        e.pending = true
-        conn.profilePictureUrl(jid, 'image')
-            .then(u => { e.url = u || DEFAULT_PP }, () => { e.url = DEFAULT_PP })
-            .finally(() => { e.t = Date.now(); e.pending = false })
-    }
-    return e.url
+    return DEFAULT_PP
 }
-
-global.fetch = fetchWithTimeout
-global.fs = fs
+let thumbPath = defaultThumb
 
 let handler = m => m
 handler.all = async function (m) {
@@ -65,6 +62,7 @@ handler.all = async function (m) {
     global.adReply = { contextInfo: {} }
 
     patchLinkPreview(this)
+    patchFavicon(this)
 
     global.sfb = {
         contextInfo: {
@@ -260,12 +258,12 @@ handler.all = async function (m) {
 
 export default handler
 
-const LP_URL = 'https://github.com/Lynx-decode/ERINE-AI'
-const LP_TITLE = '୨ৎ ERINE-AI • ELYRINE'
+const LP_URL = 'https://github.com/Lynxcode-id/elyrine'
+const LP_TITLE = '୨ৎ ERINE-AI ~ 3ND PROJECT'
 const LP_THUMB = 'https://raw.githubusercontent.com/its-dinda/image/main/1793839373037.jpeg'
-const LP_VERSION = 'erine-linkpreview-4'
+const LP_VERSION = 'erine-linkpreview-6'
+const LP_CACHE_MS = 30 * 60 * 1000
 let lpCache = null
-let lpFailAt = 0
 
 async function getLpRaw() {
     const custom = getCustomThumb()
@@ -274,7 +272,7 @@ async function getLpRaw() {
         const mod = await import('../../lib/thumbnail.js')
         const t = mod.getRandomThumb ? mod.getRandomThumb('thumbnail') : null
         if (Buffer.isBuffer(t)) return t
-    } catch (e) {}
+    } catch (e) { }
     try {
         const res = await Promise.race([
             fetch(LP_THUMB).then(r => r.arrayBuffer()),
@@ -283,23 +281,18 @@ async function getLpRaw() {
         return Buffer.from(res)
     } catch (e) {
         console.error('[ALLFAKE] gagal ambil thumbnail bawaan:', e && e.message ? e.message : e)
-        return null
+        return defaultThumb
     }
 }
 
-async function getLpThumbs() {
+async function getLinkPreview() {
     const key = (getCustomThumb() || {}).mtimeMs || 0
-    if (lpCache && lpCache.key === key) return lpCache
-    if (lpFailAt && Date.now() - lpFailAt < 5 * 60 * 1000) return { small: thumbPath }
-    const raw = await getLpRaw()
-    if (!raw) lpFailAt = Date.now()
-    let small = raw || thumbPath
-    try {
-        const sharp = (await import('sharp')).default
-        small = await sharp(raw || thumbPath).resize(300, 300, { fit: 'cover', position: 'center' }).jpeg({ quality: 85 }).toBuffer()
-    } catch (e) {}
-    if (raw) lpCache = { small, key }
-    return { small }
+    if (!lpCache || lpCache.key !== key || Date.now() - lpCache.at > LP_CACHE_MS) {
+        const raw = await getLpRaw()
+        const linkPreview = await buildSquareLinkPreview({ url: LP_URL, title: LP_TITLE, description: '', image: raw })
+        lpCache = { key, at: Date.now(), linkPreview }
+    }
+    return { ...lpCache.linkPreview, description: global.ucapan || namebot }
 }
 
 function patchLinkPreview(conn) {
@@ -322,19 +315,9 @@ function patchLinkPreview(conn) {
                 (hasAd || !/https?:\/\//i.test(c.text))
             if (!plain) return await originalSend(jid, content, options)
 
-            const { small } = await getLpThumbs()
+            const linkPreview = await getLinkPreview()
             const contextInfo = c.contextInfo ? { ...c.contextInfo } : undefined
             if (contextInfo) delete contextInfo.externalAdReply
-
-            const linkPreview = {
-                'matched-text': LP_URL,
-                matchedText: LP_URL,
-                canonicalUrl: LP_URL,
-                title: LP_TITLE,
-                description: global.ucapan || namebot,
-                previewType: 0,
-                jpegThumbnail: small
-            }
 
             const out = {
                 ...c,

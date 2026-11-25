@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -21,7 +21,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { execFileSync } from 'node:child_process'
 import { performance } from 'node:perf_hooks'
-import { AIRich } from 'elyra-baileys'
+import { AIRich } from '../../lib/airich.js'
 
 const LOGO = 'https://raw.githubusercontent.com/its-dinda/image/main/1793945302377.jpeg'
 const FOOTER = '© 𝙴𝚁𝙸𝙽𝙴-𝙰𝙸 ~ 𝙸𝙽𝙵𝙾𝚁𝙼𝙰𝚃𝙸𝙾𝙽'

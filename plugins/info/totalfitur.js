@@ -9,15 +9,15 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
   izin tertulis dari developer. Jangan hapus kredit ini.
 */
 
-const BOT_TITLE = 'ERINE-AI • ELYRINE'
-const FOOTER = 'ERINE-AI • ELYRINE'
+const BOT_TITLE = 'ERINE-AI ~ 3ND PROJECT'
+const FOOTER = 'ҽɾιɳҽ-αι 3ɳԃ'
 
 const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '')
 const pct = (n, total) => (total ? Math.round((n / total) * 100) : 0)

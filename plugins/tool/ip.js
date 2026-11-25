@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -26,7 +26,7 @@ const handler = async (m, { text, usedPrefix, command }) => {
     await conn.sendMessage(m.chat, { location: { degreesLatitude: res.latitude, degreesLongitude: res.longitude }},{ ephemeralExpiration: 604800 });
     await delay(2000);
     m.sukses(JSON.stringify(res, null, 2));
-  } catch (e) { 
+  } catch (e) {
     throw new Error(`IP ${text} not found!`);
   }
 }

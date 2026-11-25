@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -18,7 +18,7 @@
 
 import { writeFileSync, mkdirSync } from 'fs'
 import { join, dirname } from 'path'
-import syntaxerror from 'syntax-error'
+import { checkSyntax } from '../../lib/syntax.js'
 
 const SAFE = /^[a-z0-9_][a-z0-9_-]*$/i
 
@@ -46,7 +46,7 @@ let handler = async (m, { text, usedPrefix, command, __dirname }) => {
   if (!code) throw 'Kode plugin kosong. Reply pesan berisi kode, atau tulis di baris bawah perintah.'
 
   const key = `${folder}/${name}.js`
-  const err = syntaxerror(code, key, { sourceType: 'module', allowAwaitOutsideFunction: true })
+  const err = checkSyntax(code, key)
   if (err) throw `❌ Syntax error, plugin TIDAK disimpan:\n\n${err}`
 
   const file = join(__dirname, key)

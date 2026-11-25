@@ -9,14 +9,14 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
   izin tertulis dari developer. Jangan hapus kredit ini.
 */
 
-import baileys, { delay } from 'elyra-baileys'
+import baileys, { delay } from 'elyrine-baileys'
 
 const API_URL = 'https://gql.nixel.dev'
 

@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -29,10 +29,6 @@ const DEFAULT_HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
 }
 
-/**
- * Mengirim permintaan link verifikasi ke email (/api/send-link)
- * @param {string} email - Alamat email target (contoh: rrrgamal3@gmail.com)
- */
 export async function sendLink(email) {
   if (!email || typeof email !== 'string' || !email.trim()) {
     throw new Error('Email tidak boleh kosong!')
@@ -64,12 +60,6 @@ export async function sendLink(email) {
   }
 }
 
-/**
- * Memverifikasi tautan Magic Link beserta cookie sesi (/api/verify-link)
- * @param {string} email - Alamat email terdaftar
- * @param {string} magicLink - URL Magic Link lengkap dari inbox
- * @param {string} cookie - Cookie session (contoh: am_sess_...)
- */
 export async function verifyLink(email, magicLink, cookie) {
   if (!email || !magicLink || !cookie) {
     throw new Error('Parameter email, magicLink, dan cookie tidak boleh kosong!')

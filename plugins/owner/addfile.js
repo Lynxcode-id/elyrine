@@ -9,7 +9,7 @@
 
   Didirikan di atas Elyra Labs & ekosistemnya.
   Komunitas   General District (induk) · INF Project · Elyra Labs
-  Engine      elyra-baileys, fork Baileys yang dikustom
+  Engine      elyrine-baileys, fork Baileys yang dikustom
               sesuai kebutuhan bot ini.
 
   Dilarang menjual, menyewakan, atau merebrand tanpa
@@ -18,7 +18,7 @@
 
 import fs from 'fs/promises'
 import path from 'path'
-import syntaxerror from 'syntax-error'
+import { checkSyntax } from '../../lib/syntax.js'
 import { ROOT } from '../../lib/function.js'
 
 const SEG = /^[\w$@][\w$@.\-]*$/
@@ -89,7 +89,7 @@ let handler = async (m, { text, usedPrefix, command }) => {
   if (data.length > MAX_SIZE) throw 'Ukuran file melebihi 20MB.'
 
   if (ext === '.js' || ext === '.mjs') {
-    const err = syntaxerror(data.toString('utf8'), rel, { sourceType: 'module', allowAwaitOutsideFunction: true, allowReturnOutsideFunction: true })
+    const err = checkSyntax(data, rel, { allowReturn: true })
     if (err) throw `❌ Syntax error, file TIDAK disimpan:\n\n${err}`
   } else if (ext === '.json') {
     try { JSON.parse(data.toString('utf8')) } catch (e) { throw `❌ JSON tidak valid, file TIDAK disimpan:\n${e.message}` }
